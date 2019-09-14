@@ -9,6 +9,12 @@
 #ifndef PCH_H
 #define PCH_H
 
-// TODO: ここでプリコンパイルするヘッダーを追加します
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#include <conio.h>
+#include "MIDIIO.h"
+#include "MIDIData.h"
+#include "MIDIClock.h"
 
 #endif //PCH_H
