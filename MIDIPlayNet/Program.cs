@@ -25,7 +25,7 @@ namespace MIDIPlayNet
 			//オープンMIDIプロジェクトのサイトにあったサンプルの方法だと、正常に再生できなかったので、フォーマット０に変換し、１トラックのイベントを最初から順番に再生することにした。
 			mIDIData.Format = MIDIData.Formats.Format0;
 
-			MIDIClock mIDIClock = new MIDIClock(MIDIClock.TimeMode.TPQNBASE, lTimeResolution, lTempo);
+			MIDIClock mIDIClock = new MIDIClock(lTimeMode, lTimeResolution, lTempo);
 
 			Console.WriteLine("Now playing...");
 			mIDIClock.Start();
@@ -39,6 +39,7 @@ namespace MIDIPlayNet
 						break;
 					}
 					int lTime = @event.Time;
+					//イベントの再生すべき時間になるまで待機
 					while (mIDIClock.TickCount <= lTime){ }
 					if (@event.IsTempo)
 					{
