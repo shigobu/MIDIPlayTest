@@ -15,50 +15,45 @@ namespace MIDIPlayNet
 		{
 			MIDIClock.TimeMode lTimeMode = 0;
 			int lTimeResolution = 0;
-			int lTempo = 60000000 / 120; /* [microsec/quarter note] */
-			int lEndTime = 0;
-			int lOldTime = 0;
-			int lCurTime = 0;
+			int lTempo = 60000000 / 160; /* [microsec/quarter note] */
 
 			MIDIOUT mIDIOUT = new MIDIOUT("Microsoft GS Wavetable Synth");
-			MIDIData mIDIData = new MIDIData("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\Let`s search for Tomorrow.mid");
+			MIDIData mIDIData = new MIDIData("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\ブラック★ロックシューター.mid");
 
 			lTimeMode = (MIDIClock.TimeMode)mIDIData.TimeMode;
 			lTimeResolution = mIDIData.TimeResolution;
-			lEndTime = mIDIData.EndTime;
+			//オープンMIDIプロジェクトのサイトにあったサンプルの方法だと、正常に再生できなかったので、フォーマット０に変換し、１トラックのイベントを最初から順番に再生することにした。
+			mIDIData.Format = MIDIData.Formats.Format0;
 
-			MIDIClock mIDIClock = new MIDIClock(lTimeMode, lTimeResolution, lTempo);
+			MIDIClock mIDIClock = new MIDIClock(MIDIClock.TimeMode.TPQNBASE, lTimeResolution, lTempo);
 
 			Console.WriteLine("Now playing...");
 			mIDIClock.Start();
 
-			while (lCurTime <= lEndTime && !Console.KeyAvailable)
+			foreach (MIDITrack track in mIDIData)
 			{
-				lCurTime = mIDIClock.TickCount;
-				Console.WriteLine(lCurTime);
-				foreach (MIDITrack track in mIDIData)
+				foreach (MIDIEvent @event in track)
 				{
-					foreach (MIDIEvent @event in track)
+					if (Console.KeyAvailable)
 					{
-						int lTime = @event.Time;
-						if (lOldTime <= lTime && lTime < lCurTime)
-						{
-							if (@event.IsTempo)
-							{
-								lTempo = @event.Tempo;
-								mIDIClock.Tempo = lTempo;
-							}
-							if (@event.IsMIDIEvent ||
-								@event.IsSysExEvent)
-							{
-								byte[] byMessage = @event.Data;
+						break;
+					}
+					int lTime = @event.Time;
+					while (mIDIClock.TickCount <= lTime){ }
+					if (@event.IsTempo)
+					{
+						lTempo = @event.Tempo;
+						mIDIClock.Tempo = lTempo;
+					}
+					if (@event.IsMIDIEvent ||
+						@event.IsSysExEvent)
+					{
+						byte[] byMessage = @event.Data;
 
-								mIDIOUT.PutMIDIMessage(byMessage);
-							}
-						}
+						mIDIOUT.PutMIDIMessage(byMessage);
 					}
 				}
-				lOldTime = lCurTime;
+				break;
 			}
 
 			mIDIClock.Stop();
@@ -66,6 +61,7 @@ namespace MIDIPlayNet
 			Console.WriteLine("Now end.");
 
 			Console.Read();
+
 		}
 	}
 }

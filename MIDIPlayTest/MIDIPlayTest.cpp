@@ -22,7 +22,7 @@ int _tmain() {
 		return 0;
 	}
 
-	pMIDIData = MIDIData_LoadFromSMF(_T("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\Let`s search for Tomorrow.mid"));
+	pMIDIData = MIDIData_LoadFromSMF(_T("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\ブラック★ロックシューター.mid"));
 	if (pMIDIData == NULL) {
 		_tprintf(_T("MIDIData Load failed.\n"));
 		return 0;
