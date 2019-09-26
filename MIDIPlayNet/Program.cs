@@ -22,39 +22,53 @@ namespace MIDIPlayNet
 
 			lTimeMode = (MIDIClock.TimeMode)mIDIData.TimeMode;
 			lTimeResolution = mIDIData.TimeResolution;
-			//オープンMIDIプロジェクトのサイトにあったサンプルの方法だと、正常に再生できなかったので、フォーマット０に変換し、１トラックのイベントを最初から順番に再生することにした。
-			mIDIData.Format = MIDIData.Formats.Format0;
+
+			//すべてのイベントを列挙してから再生
+			List<List<MIDIEvent>> mIDIEvents = new List<List<MIDIEvent>>();
+			foreach (var track in mIDIData)
+			{
+				List<MIDIEvent> events = new List<MIDIEvent>();
+				foreach (var @event in track)
+				{
+					events.Add(@event);
+				}
+				mIDIEvents.Add(events);
+			}
 
 			MIDIClock mIDIClock = new MIDIClock(lTimeMode, lTimeResolution, lTempo);
 
 			Console.WriteLine("Now playing...");
 			mIDIClock.Start();
 
-			foreach (MIDITrack track in mIDIData)
+			int lCurTime = 0;
+			int lEndTime = mIDIData.EndTime;
+			int lOldTime = 0;
+			while (lCurTime <= lEndTime && !Console.KeyAvailable)
 			{
-				foreach (MIDIEvent @event in track)
+				lCurTime = mIDIClock.TickCount;
+				foreach (var track in mIDIEvents)
 				{
-					if (Console.KeyAvailable)
+					foreach(var @event in track)
 					{
-						break;
-					}
-					int lTime = @event.Time;
-					//イベントの再生すべき時間になるまで待機
-					while (mIDIClock.TickCount <= lTime){ }
-					if (@event.IsTempo)
-					{
-						lTempo = @event.Tempo;
-						mIDIClock.Tempo = lTempo;
-					}
-					if (@event.IsMIDIEvent ||
-						@event.IsSysExEvent)
-					{
-						byte[] byMessage = @event.Data;
+						int lTime = @event.Time;
+						if (lOldTime <= lTime && lTime < lCurTime)
+						{
+							if (@event.IsTempo)
+							{
+								lTempo = @event.Tempo;
+								mIDIClock.Tempo = lTempo;
+							}
+							if (@event.IsMIDIEvent ||
+								@event.IsSysExEvent)
+							{
+								byte[] byMessage = @event.Data;
 
-						mIDIOUT.PutMIDIMessage(byMessage);
+								mIDIOUT.PutMIDIMessage(byMessage);
+							}
+						}
 					}
 				}
-				break;
+				lOldTime = lCurTime;
 			}
 
 			mIDIClock.Stop();
