@@ -18,7 +18,7 @@ namespace MIDIPlayNet
 			int lTempo = 60000000 / 160; /* [microsec/quarter note] */
 
 			MIDIOUT mIDIOUT = new MIDIOUT("Microsoft GS Wavetable Synth");
-			MIDIData mIDIData = new MIDIData("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\ブラック★ロックシューター.mid");
+			MIDIData mIDIData = new MIDIData("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\君とみた海(完全版)\\君とみた海(伴奏).mid");
 
 			lTimeMode = (MIDIClock.TimeMode)mIDIData.TimeMode;
 			lTimeResolution = mIDIData.TimeResolution;

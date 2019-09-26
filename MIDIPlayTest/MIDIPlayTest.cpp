@@ -3,6 +3,9 @@
 /* Don't forget to add MIDIData(d).lib to your project */
 /* Don't forget to add MIDIClock(d).lib to your project */
 
+#include<vector>
+#include<xstring>
+
 int _tmain() {
 	long lTimeMode = 0;
 	long lTimeResolution = 0;
@@ -20,6 +23,24 @@ int _tmain() {
 	if (pMIDIOut == NULL) {
 		_tprintf(_T("MIDIOut Open failed.\n"));
 		return 0;
+	}
+
+	std::vector<std::wstring> devicenames;
+	int num = MIDIOut_GetDeviceNum();
+	for (size_t i = 0; i < num; i++)
+	{
+		TCHAR str[256] = { 0 };
+		MIDIOut_GetDeviceName(i, str, 256);
+		devicenames.push_back(std::wstring(str));
+	}
+
+	devicenames.clear();
+	num = MIDIOut_GetDeviceNum();
+	for (size_t i = 0; i < num; i++)
+	{
+		TCHAR str[256] = { 0 };
+		MIDIOut_GetDeviceName(i, str, 256);
+		devicenames.push_back(std::wstring(str));
 	}
 
 	pMIDIData = MIDIData_LoadFromSMF(_T("D:\\旧ドキュメント\\TSQ\\音楽(tsq)\\ブラック★ロックシューター.mid"));
